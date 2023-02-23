@@ -1,0 +1,14 @@
+GET http://localhost:3002/api/get
+
+###
+GET  http://localhost:3002/api/getFromId/2
+
+###
+POST http://localhost:3002/api/create
+Content-Type: application/json
+
+{
+    "username": "Yahoo User",
+    "title": "Accusantium deserunt error",
+    "text": "Accusantium deserunt error doloribus blanditiis? Ab voluptates sunt nam ratione distinctio eaque"
+}
