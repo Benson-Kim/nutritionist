@@ -8,9 +8,19 @@ app.use(cors());
 app.use(express.json())
 
 
-// Route to get all posts
-app.get("/api/get", (req, res) => {
-    db.query("SELECT * FROM posts", (err, result) => {
+// Route to get all clients
+app.get("/api/query1", (req, res) => {
+    db.query("SELECT firstname, surname, weight, height, sex,age, telephone FROM Client", (err, result) => {
+        if (err) {
+            console.log(err)
+        }
+        res.send(result)
+    });
+});
+
+app.get("/api/query2", (req, res) => {
+    const { CLIENT_ID, MEAL_DATE } = req.body;
+    db.query(`SELECT * FROM meal WHERE clientid = ${CLIENT_ID} AND mealdate = '${MEAL_DATE}'`, (err, result) => {
         if (err) {
             console.log(err)
         }

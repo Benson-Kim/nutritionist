@@ -1,4 +1,4 @@
-GET http://localhost:3002/api/get
+GET http://localhost:3002/api/query1
 
 ###
 GET  http://localhost:3002/api/getFromId/2
