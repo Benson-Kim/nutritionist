@@ -1,14 +1,13 @@
 GET http://localhost:3002/api/query1
 
 ###
-GET  http://localhost:3002/api/getFromId/2
-
-###
-POST http://localhost:3002/api/create
+GET  http://localhost:3002/api/query2
 Content-Type: application/json
 
 {
-    "username": "Yahoo User",
-    "title": "Accusantium deserunt error",
-    "text": "Accusantium deserunt error doloribus blanditiis? Ab voluptates sunt nam ratione distinctio eaque"
+    "CLIENT_ID": 1,
+    "MEAL_DATE": "2022-04-11"
 }
+
+###
+GET http://localhost:3002/api/query3
