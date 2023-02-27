@@ -7,6 +7,35 @@ const PORT = 3002;
 app.use(cors());
 app.use(express.json());
 
+// enable the user to insert, update, delete a record.
+
+// Route for inserting a client
+app.post("/api/client/create", (req, res) => {
+  const [firstname, surname, weight, height, sex, telephone] = req.body;
+
+  db.query(
+    "INSERT INTO Client (firstname, surname, weight, height, sex, telephone) VALUES (?,?,?,?,?,?)",
+    [firstname, surname, weight, height, sex, telephone],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(result);
+    }
+  );
+});
+
+// Route to delete a client
+app.delete("/api/client/delete/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM Client WHERE clientID= ?", id, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+});
+
 // Route to get all clients
 app.get("/api/query1", (req, res) => {
   db.query(
@@ -20,10 +49,12 @@ app.get("/api/query1", (req, res) => {
   );
 });
 
-app.get("/api/query2", (req, res) => {
-  const { CLIENT_ID, MEAL_DATE } = req.body;
+app.get("/api/query2/:clientid/:date", (req, res) => {
+  const { clientid, date } = req.params;
   db.query(
-    `SELECT * FROM meal WHERE clientid = ${CLIENT_ID} AND mealdate = '${MEAL_DATE}'`,
+    `SELECT mealName, mealDate, mealTime, clientID 
+        FROM meal
+        WHERE clientID = ${clientid} AND mealDate = '${date}'`,
     (err, result) => {
       if (err) {
         console.log(err);
@@ -36,6 +67,25 @@ app.get("/api/query2", (req, res) => {
 app.get("/api/query3", (req, res) => {
   db.query(
     "SELECT * FROM foodingredients WHERE calories < (SELECT AVG(calories) FROM foodingredients)",
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.send(result);
+    }
+  );
+});
+
+app.get("/api/query4/:mealdate", (req, res) => {
+  const { mealdate } = req.params;
+  db.query(
+    `SELECT c.firstname, c.surname FROM client c
+			INNER JOIN meal m ON c.clientID = m.clientID
+			INNER JOIN MealConsumption mc ON m.mealID = mc.mealID
+			INNER JOIN FoodIngredients fi ON mc.foodID = fi.foodID
+		WHERE m.mealDate = '${mealdate}'
+		ORDER BY (fi.calories * mc.amount) DESC
+		LIMIT 1`,
     (err, result) => {
       if (err) {
         console.log(err);
@@ -135,33 +185,50 @@ app.get("/api/query11", (req, res) => {
   );
 });
 
-// Route for creating the post
-app.post("/api/create", (req, res) => {
-  const username = req.body.username;
-  const title = req.body.title;
-  const text = req.body.text;
-
+app.get("/api/query12/:mealdate", (req, res) => {
+  const { mealdate } = req.params;
   db.query(
-    "INSERT INTO posts (title, post_text, author_name) VALUES (?,?,?)",
-    [title, text, username],
+    `SELECT 
+        CASE 
+			WHEN (c.weight / (c.height * c.height)) < 18.5 THEN 'Underweight'
+			WHEN (c.weight / (c.height * c.height)) >= 18.5 AND (c.weight / (c.height * c.height)) < 25 THEN 'Healthy'
+			WHEN (c.weight / (c.height * c.height)) >= 25 AND (c.weight / (c.height * c.height)) < 30 THEN 'Overweight'
+			WHEN (c.weight / (c.height * c.height)) >= 30 THEN 'Obese'
+		END AS weight_status,
+        m.mealDate, AVG(TIME_TO_SEC(m.mealTime)) / 3600 AS average_time
+        FROM meal m
+			INNER JOIN client c ON m.clientID = c.clientID
+		WHERE m.mealDate = '${mealdate}'
+        GROUP BY weight_status, m.mealDate`,
     (err, result) => {
       if (err) {
         console.log(err);
       }
-      console.log(result);
+      res.send(result);
     }
   );
 });
 
-// Route to delete a post
-app.delete("/api/delete/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query("DELETE FROM posts WHERE id= ?", id, (err, result) => {
-    if (err) {
-      console.log(err);
+app.get("/api/query13/:startdate/:enddate", (req, res) => {
+  const { startdate, enddate } = req.params;
+  db.query(
+    `SELECT fi.name AS ingredient_name, SUM(mc.amount) AS total_amount
+		FROM meal m
+			INNER JOIN MealConsumption mc ON m.mealID = mc.mealID
+			INNER JOIN FoodIngredients fi ON mc.foodID = fi.foodID
+			INNER JOIN client c ON m.clientID = c.clientID
+		WHERE (c.weight / (c.height * c.height)) >= 30
+			AND m.mealDate BETWEEN '${startdate}' AND '${enddate}'
+		GROUP BY mc.foodID
+		ORDER BY SUM(mc.amount) DESC
+		LIMIT 1`,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.send(result);
     }
-  });
+  );
 });
 
 app.listen(PORT, () => {

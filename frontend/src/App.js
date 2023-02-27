@@ -1,9 +1,9 @@
-import React from 'react'
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // import './App.css'
-import CreatePost from './pages/CreatePost';
-import MainPage from './pages/MainPage';
-import Post from './pages/Post'
+import CreatePost from "./pages/CreatePost";
+import MainPage from "./pages/MainPage";
+import Post from "./pages/Post";
 
 const App = () => {
   return (
@@ -13,7 +13,6 @@ const App = () => {
           <a href="/">Main Page</a>
           <a href="/createpost">Create Post</a>
         </div>
-
       </div>
 
       <Router>
@@ -24,7 +23,7 @@ const App = () => {
         </Routes>
       </Router>
     </div>
-  )
-}
+  );
+};
 
 export default App;
