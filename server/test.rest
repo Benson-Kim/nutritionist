@@ -1,13 +1,30 @@
-GET http://localhost:3002/api/query1
+POST http://localhost:3002/api/client/create
+Content-Type: application/json
+
+{
+    "ClientID": 11,
+    "firstname":"Johannes", 
+    "surname":"Dreat", 
+    "weight":"56.5", 
+    "height":"1.56",  
+    "sex":"M", 
+    "age":27,
+    "telephone":"212-818-8382"
+}
 
 ###
-GET  http://localhost:3002/api/query12/1/2022-04-11
+DELETE http://localhost:3002/api/client/11
+
+###
+GET http://localhost:3002/api/query1
+
+
 
 ###
 GET http://localhost:3002/api/query3
 
 ###
-GET http://localhost:3002/api/query4
+GET  http://localhost:3002/api/query4/2022-10-26
 
 ###
 GET http://localhost:3002/api/query5
@@ -31,4 +48,7 @@ GET http://localhost:3002/api/query10
 GET http://localhost:3002/api/query11
 
 ###
-GET  http://localhost:3002/api/query12/2022-04-11/2023-10-26
+GET  http://localhost:3002/api/query12/2022-04-11
+
+###
+GET  http://localhost:3002/api/query13/2022-04-11/2023-10-26

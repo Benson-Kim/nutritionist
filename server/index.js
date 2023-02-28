@@ -11,35 +11,45 @@ app.use(express.json());
 
 // Route for inserting a client
 app.post("/api/client/create", (req, res) => {
-  const [firstname, surname, weight, height, sex, telephone] = req.body;
+  const { clientid, firstname, surname, weight, height, sex, age, telephone } =
+    req.body;
 
-  db.query(
-    "INSERT INTO Client (firstname, surname, weight, height, sex, telephone) VALUES (?,?,?,?,?,?)",
-    [firstname, surname, weight, height, sex, telephone],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(result);
-    }
-  );
+  const sql =
+    "INSERT INTO Client (ClientID, firstname, surname, weight, height, sex,age, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  const values = [
+    clientid,
+    firstname,
+    surname,
+    weight,
+    height,
+    sex,
+    age,
+    telephone,
+  ];
+
+  db.query(sql, values, (err, result) => {
+    if (err) throw err;
+
+    console.log("New client added to the database");
+    res.status(200).json({ message: "New client added to the database" });
+  });
 });
 
 // Route to delete a client
-app.delete("/api/client/delete/:id", (req, res) => {
-  const id = req.params.id;
+app.delete("/api/client/:id", (req, res) => {
+  const clientId = req.params.id;
 
-  db.query("DELETE FROM Client WHERE clientID= ?", id, (err, result) => {
-    if (err) {
-      console.log(err);
-    }
+  const sql = "DELETE FROM Client WHERE clientID = ?";
+  db.query(sql, [clientId], (err, result) => {
+    if (err) throw err;
+    res.send(`Deleted ${result.affectedRows} row(s)`);
   });
 });
 
 // Route to get all clients
 app.get("/api/query1", (req, res) => {
   db.query(
-    "SELECT firstname, surname, weight, height, sex,age, telephone FROM Client",
+    "SELECT ClientID, firstname, surname, weight, height, sex,age, telephone FROM Client",
     (err, result) => {
       if (err) {
         console.log(err);
